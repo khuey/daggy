@@ -14,6 +14,10 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+
 pub extern crate petgraph;
 use petgraph as pg;
 
@@ -62,12 +66,12 @@ pub type RawEdges<'a, E, Ix> = &'a [pg::graph::Edge<E, Ix>];
 ///
 /// The **Dag** also offers methods for accessing the underlying **Graph**, which can be useful
 /// for taking advantage of petgraph's various graph-related algorithms.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Dag<N, E, Ix: IndexType = DefaultIx> {
     graph: PetGraph<N, E, Ix>,
+    #[serde(skip_serializing, skip_deserializing, default = "DfsSpace::default")]
     cycle_state: DfsSpace<NodeIndex<Ix>, <PetGraph<N, E, Ix> as Visitable>::Map>,
 }
-
 
 /// A **Walker** type that can be used to step through the children of some parent node.
 pub struct Children<N, E, Ix: IndexType> {
